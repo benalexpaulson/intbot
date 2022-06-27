@@ -1,0 +1,30 @@
+{
+  "name": "intbot",
+  "version": "0.0.1",
+  "description": "A discord bot to hide / show channels based on interest",
+  "main": "index.js",
+  "scripts": {
+    "test": "test"
+  },
+  "keywords": [
+    "discord.js",
+    "bot"
+  ],
+  "author": "xianith",
+  "license": "ISC",
+  "dependencies": {
+    "@discordjs/builders": "^0.15.0",
+    "@discordjs/rest": "^0.5.0",
+    "@discordjs/voice": "^0.10.0",
+    "discord-api-types": "^0.35.0",
+    "discord.js": "^13.8.1",
+    "ffmpeg-static": "^4.4.1",
+    "libsodium-wrappers": "^0.7.10",
+    "mysql": "^2.18.1",
+    "python": "^0.0.4",
+    "ytdl-core": "^4.11.0"
+  },
+  "devDependencies": {
+    "eslint": "^8.18.0"
+  }
+}
