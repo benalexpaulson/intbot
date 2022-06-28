@@ -16,8 +16,8 @@ module.exports = {
 		  	  list = `${list}${count} - ${item.mp3.replace('.mp3','')}\n`;
 		  		options.push(
 		  			{
-		  				label: `${count}`,
-		  				description: `${item.mp3.replace('.mp3','')}`,
+		  				label: `${count} - ${item.mp3.replace('.mp3','')}`,
+		  				// description: `${item.mp3.replace('.mp3','')}`,
 		  				value: `${count}`,
 		  			}
 		  		);

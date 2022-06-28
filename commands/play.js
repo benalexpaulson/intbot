@@ -1,13 +1,24 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
+const refreshDB = require('../index.js');
 
 module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('play')
 		.setDescription('Plays a audio clip that the bot has stored.')
-		.addUserOption(option => option.setName('user').setDescription('The user')),
+		.addIntegerOption(option => option.setName('id')
+			.setDescription('Id of the audio clip')
+			.setRequired(true)),
 	async execute(interaction) {
-		// console.log(interaction);
-		await interaction.reply(interaction.user.username+' played!');
-		intro(interaction, interaction);
+		let mp3 = interaction.options._hoistedOptions[0].value;
+		const intro = require('../funcs/intro.js');
+
+		if (!interaction.member.voice.channelId) {
+			await interaction.reply(`:warning: **This command requires you to be in a voice channel!**`);
+		} else if (mp3 > dbMp3.length) { 
+			await interaction.reply(':warning: **Audio file not found!** Check `/list`');
+		} else {
+			intro(interaction.member, mp3-2);
+			await interaction.reply('played ```'+mp3+' - '+dbMp3[mp3-1].mp3+'```');
+		}
 	},
 };

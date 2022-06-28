@@ -4,6 +4,7 @@ const { Client, Collection, Intents } = require('discord.js');
 
 const { prefix, token, dbuser, dbpw, db } = require("./config.json");
 const ytdl = require("ytdl-core");
+const intro = require('./funcs/intro.js');
 
 // 
 // Commands
@@ -22,12 +23,13 @@ for (const file of commandFiles) {
 }
 
 client.once('ready', () => {
-	initDB();
-	process.stdout.write('Bot [✔️]');
+	syncDB();
+	process.stdout.write('Bot [ \x1b[32m✔️\x1b[89m\x1b[0m ]');
 });
 
 client.on('interactionCreate', async interaction => {
 	if (!interaction.isCommand()) return;
+	syncDB('refresh');
 	const command = client.commands.get(interaction.commandName);
 
 		if (!command) return;
@@ -43,8 +45,15 @@ client.on('interactionCreate', async interaction => {
 client.on('interactionCreate', async interaction => {
 	if (!interaction.isSelectMenu()) return;
 		if (interaction.customId === 'select') {
-			console.log(interaction);
-			await interaction.update({ content: `played audio clip ${interaction.values[0]}`, components: [] });
+			let mp3 = parseInt(interaction.values[0]);
+
+			if (!interaction.member.voice.channelId) {
+				await interaction.reply(`:warning: **This command requires you to be in a voice channel!**`);
+			} else {
+				syncDB('refresh');
+				intro(interaction.member, mp3-2);
+				await interaction.reply('played ```'+mp3+' - '+dbMp3[mp3-1].mp3+'```');
+			}
 		}
 });
 
@@ -54,8 +63,8 @@ client.on('interactionCreate', async interaction => {
 
 client.on('voiceStateUpdate', (oldState, newState) => {
 	const user = {newState, oldState};
-	const intro = require('./funcs/intro.js');
-  intro(user);
+	syncDB('refresh');
+  	intro(user);
 })
 
 client.login(token);
@@ -64,7 +73,7 @@ client.login(token);
 // DB
 // 
 
-async function initDB() {
+async function syncDB(reason) {
 	var mysql = require('mysql');
 
 	var dbclient = mysql.createPool({
@@ -75,8 +84,7 @@ async function initDB() {
 	  charset : "utf8mb4",
 	});
 
-	// process.stdout.clearLine();
-	process.stdout.write('MP3 DB [✔️]   |   ');
+	if (reason != 'refresh') process.stdout.write('MP3 DB [ \x1b[32m✔️\x1b[89m\x1b[0m ]   |   ');
 
 	dbclient.query("SELECT * FROM songs", function (err, result, fields) {
 	  if (err) throw err;
@@ -89,6 +97,6 @@ async function initDB() {
 	  global.dbUser = result;
 	});
 
-	process.stdout.write('Users DB [✔️]   |   ');
+	if (reason != 'refresh') process.stdout.write('Users DB [ \x1b[32m✔️\x1b[89m\x1b[0m ]   |   ');
 }
 

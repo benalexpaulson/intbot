@@ -1,35 +1,44 @@
-module.exports = async function intro(user, id) {
- const newState = user.newState, oldState = user.oldState;
-	if (newState.member.user.bot || oldState.channelId) { console.log("Bot! >>" + newState.member.bot +"--"+oldState.channelId); return; }
- const { joinVoiceChannel, createAudioPlayer, createAudioResource, AudioPlayerStatus  } = require('@discordjs/voice');
- const player = createAudioPlayer();
+module.exports = async function intro(user, mp3Id) {
+  const { joinVoiceChannel, createAudioPlayer, createAudioResource, AudioPlayerStatus  } = require('@discordjs/voice');
+  const player = createAudioPlayer();
+  var listener, voiceChannelId, voiceGuildId;
 
- const connection = joinVoiceChannel({
- 	channelId: newState.channel.id,
- 	guildId: newState.channel.guild.id,
- 	adapterCreator: newState.channel.guild.voiceAdapterCreator,
- });
+  if (user.hasOwnProperty('newState')) {
+      listener = user.newState.member, oldState = user.oldState;
+      if (listener.user.bot || oldState.channelId) { return; }
+      voiceChannelId = user.newState.channel.id;
+      voiceGuildId = user.newState;
+  } else { listener = user;
+    voiceChannelId = listener.voice.channelId; 
+    voiceGuildId = listener.voice;
+  }
 
  let introId = 17, customUser;
 
  dbUser.forEach(async function getUser(item, index) {
-     if (newState.member.user.id === item.did) { customUser = item.intro-1; } else { return; }
+     if (listener.user.id === item.did) { customUser = item.intro; } else { return; }
    await customUser
  })
 
  if (customUser) introId = customUser;
- if (id) introId = id;
+ if (customUser == 0) return;
+ if (mp3Id) introId = mp3Id+1;
 
- setTimeout(function() {
-  const resource = createAudioResource('audio/'+dbMp3[introId].mp3, {volume: dbMp3[introId].volume});
-  player.play(resource);
+  const connection = joinVoiceChannel({
+  channelId: voiceChannelId,
+  guildId: voiceGuildId.channel.guild.id,
+  adapterCreator: voiceGuildId.channel.guild.voiceAdapterCreator,
+ });
 
-  const subscription = connection.subscribe(player);
+  setTimeout(function() {
+   const resource = createAudioResource('audio/'+dbMp3[introId-1].mp3, {volume: dbMp3[introId-1].volume});
+   player.play(resource);
 
-  player.on(AudioPlayerStatus.Idle, () => {
-    subscription.unsubscribe();
-    connection.destroy();
-  });
- }, 10);
+   const subscription = connection.subscribe(player);
 
+   player.on(AudioPlayerStatus.Idle, () => {
+     subscription.unsubscribe();
+     connection.destroy();
+   });
+  }, 10);
 }
