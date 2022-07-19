@@ -1,39 +1,34 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
-const { prefix, token, dbuser, dbpw, db, clientId, guild } = require("../config.json");
-var mysql = require('mysql');
-
-var dbclient = mysql.createPool({
-  host: "localhost",
-  user: dbuser,
-  password: dbpw,
-  database: db,
-  charset : "utf8mb4",
-});
-
-var customMp3 = [];
-dbclient.query("SELECT * FROM songs", function (err, result, fields) {
-  if (err) throw err;
-  customMp3 = result;
-});
+const { MessageActionRow, Modal, TextInputComponent, MessageSelectMenu, MessageButton } = require('discord.js');
 
 module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('config')
-		.setDescription('Configure your roles and intro on this server.'),
+		.setDescription('Configure this servers intro bot.'),
 	async execute(interaction) {
-		
-		var list = "";
-		customMp3.forEach(async function printMp3s(item, index) {
-		  var count = index+1;
-		  if (list) { 
-		  		list = `${list}${count} - ${item.mp3.replace('.mp3','')}\n`;
-		  } else {
-		  		list = `${count} - ${item.mp3.replace('.mp3','')}\n`;
-		  }
-		  if (index+1 === customMp3.length) {
-		  	await interaction.reply(":headphones: **Audio List**\n```py\n" + list +"\n```*to play type* : `^obi #`");
-		  	// await message.channel.send(":headphones: **Audio List**\n```py\n" + list +"\n```*to play type* : `^obi #`");
-		  }
-		});
-	},
+				const modal = new Modal()
+					.setCustomId('introModal')
+					.setTitle('Intro Configuration');
+
+				const mp3Id = new TextInputComponent()
+					.setCustomId('mp3Id')
+					.setLabel("ID of Intro (check /list):")
+					.setStyle('SHORT');
+
+				const botName = new TextInputComponent()
+					.setCustomId('botName')
+					.setLabel("Name of bot during your intro:")
+					.setStyle('SHORT');
+
+		  	// 	const roll = new MessageSelectMenu()
+					// .setCustomId('roll')
+					// .setPlaceholder('Show roll when intro plays?')
+					// .addOptions([{label:'Yes',value:'1'},{label:'No',value:'0'}]);
+
+				const first = new MessageActionRow().addComponents(mp3Id);
+				const second = new MessageActionRow().addComponents(botName);
+				// const third = new MessageActionRow().addComponents(roll);
+				modal.addComponents(first, second);
+				await interaction.showModal(modal);
+		},
 };

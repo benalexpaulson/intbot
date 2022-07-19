@@ -1,5 +1,4 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
-const refreshDB = require('../index.js');
 
 module.exports = {
 	data: new SlashCommandBuilder()
@@ -14,10 +13,10 @@ module.exports = {
 
 		if (!interaction.member.voice.channelId) {
 			await interaction.reply(`:warning: **This command requires you to be in a voice channel!**`);
-		} else if (mp3 > dbMp3.length) { 
+		} else if (mp3-1 > dbMp3.length) { 
 			await interaction.reply(':warning: **Audio file not found!** Check `/list`');
 		} else {
-			intro(interaction.member, mp3-2);
+			intro(interaction.member, mp3-1);
 			await interaction.reply('played ```'+mp3+' - '+dbMp3[mp3-1].mp3+'```');
 		}
 	},
