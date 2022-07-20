@@ -24,7 +24,7 @@ for (const file of commandFiles) {
 
 client.once('ready', () => {
 	syncDB();
-	process.stdout.write('Boot [ \x1b[32m✔️\x1b[89m\x1b[0m ]');
+	process.stdout.write('Boooot [ \x1b[32m✔️\x1b[89m\x1b[0m ]');
 });
 
 client.on('interactionCreate', async interaction => {
